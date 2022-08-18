@@ -1,3 +1,5 @@
+#include <math.h>
+#include <stdio.h>
 #include "main.h"
 
 /**
