@@ -1,50 +1,39 @@
-#include "main.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/uio.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 /**
- * _strlen - compute the length of a NULL-terminated string
- * @str: the string to measure
- *
- * Return: the length of str, or -1 if str is NULL
- */
-ssize_t _strlen(const char *str)
-{
-	ssize_t len = 0;
-
-	if (!str)
-		return (-1);
-
-	while (*str++)
-		++len;
-
-	return (len);
-}
-
-/**
- * append_text_to_file - append text to the end of a file
- * @filename: the name of the file to append to
- * @text_content: the data to append to filename
- *
- * Return: Upon success, return 1. Otherwise, return -1.
+ * append_text_to_file - A function that appends text at the end to the  file
+ * @filename: The filename to open and append in
+ * @text_content: The NULL terminated string to add
+ * Return: 1 on success, -1 if the file can not be created, nor written,
+ * nor write fails.
  */
 int append_text_to_file(const char *filename, char *text_content)
 {
-	ssize_t b_written = 0;
-	int fd;
+	int fdo, fdw, len = 0;
 
-	if (!filename)
+	if (filename == NULL)
 		return (-1);
 
-	fd = open(filename, O_WRONLY | O_APPEND);
+	fdo = open(filename, O_RDWR | O_APPEND);
+	if (fdo < 0)
+		return (-1);
+	if (text_content == NULL)
+	{
+		close(fdo);
+		return (1);
+	}
 
-	if (fd < 0)
+	while (*(text_content + len))
+		len++;
+
+	fdw = write(fdo, text_content, len);
+	close(fdo);
+	if (fdw < 0)
 		return (-1);
 
-	if (text_content)
-		b_written = write(fd, text_content, _strlen(text_content));
-
-	close(fd);
-
-	if (b_written < 0)
-		return (-1);
 	return (1);
 }
